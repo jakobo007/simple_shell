@@ -4,7 +4,8 @@
  * Responsible for reading user input, tokenizing, and executing commands.
  * Returns: Always returns 0.
  */
-int main() {
+int main()
+{
 char *input = NULL;
 size_t size_of_input = 0;
 signal(SIGTERM, end_of_file);

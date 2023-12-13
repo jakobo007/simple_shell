@@ -4,7 +4,8 @@
  * @command: The command to be executed.
  * @args: Array of arguments passed to the command.
  */
-void execute_command(char *command, char *args[]) {
+void execute_command(char *command, char *args[])
+{
 pid_t pid = fork();
 if (pid == -1)
 {

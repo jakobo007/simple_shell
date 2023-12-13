@@ -2,7 +2,8 @@
 /**
  * environment - Displays the environment variables.
  */
-void environment(void) {
+void environment(void)
+{
 char **env = environ;
 while (*env != NULL) {
 size_t len = strlen(*env);

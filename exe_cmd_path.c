@@ -4,7 +4,8 @@
  * @cmd: The command to be executed.
  * @args: Array of arguments passed to the command.
  */
-void execute_CMD_PATH(char *cmd, char *args[]) {
+void execute_CMD_PATH(char *cmd, char *args[])
+{
 char *path = getenv("PATH");
 char *copy_path = strdup(path);
 char *dir = strtok(copy_path, ":");
