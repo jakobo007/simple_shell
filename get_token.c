@@ -10,7 +10,8 @@ const char delimiter[] = " \t\n";
 char *token = strtok(input, delimiter);
 char *args[MAX_INPUT_SIZE];
 int i = 0;
-while (token != NULL) {
+while (token != NULL)
+{
 if (i >= MAX_INPUT_SIZE - 1)
 {
 fprintf(stderr, "Too many arguments\n");

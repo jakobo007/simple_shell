@@ -3,12 +3,13 @@
  * main - Main function for the shell program.
  * Return: Always 0.
  */
-int main() {
+int main(void)
+{
 char *input = NULL;
 size_t size_of_input = 0;
 signal(SIGTERM, end_of_file);
 signal(SIGINT, new_line);
-while(1)
+while (1)
 {
 write(STDOUT_FILENO, "$ ", 2);
 fflush(stdout);
@@ -21,5 +22,5 @@ input[strcspn(input, "\n")] = '\0';
 gettoken(input);
 }
 free(input);
-return 0;
+return (0);
 }
