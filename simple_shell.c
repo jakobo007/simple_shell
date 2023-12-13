@@ -18,7 +18,7 @@ if (getline(&input, &size_of_input, stdin) == -1)
 perror("getline");
 exit(EXIT_FAILURE);
 }
-input[strcspn(input, "\n")] = '\0';
+/** input[strcspn(input, "\n")] = '\0'; **/
 gettoken(input);
 }
 free(input);
