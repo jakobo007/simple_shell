@@ -17,7 +17,7 @@ else if (pid == 0)
 {
 if (strchr(command, '/') != NULL)
 {
-execve(command, args);
+execve(command, args, environ);
 perror(args[0]);
 exit(EXIT_FAILURE);
 }
