@@ -13,9 +13,9 @@ extern char **environ;
 
 void new_line();
 void end_of_file();
-void environment(void);
-/** void execute_CMD_PATH(char *cmd, char *args[]);  **/
+void print_environment();
+void execute_cmd_path(char *cmd, char *args[]);
 void execute_command(char *command, char *args[]);
-void gettoken(char *input);
+void tokenize_and_execute(char *input);
 
 #endif
