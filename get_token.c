@@ -3,7 +3,8 @@
  * gettoken - Tokenizes the input and executes the appropriate action.
  * @input: The input string.
  */
-void gettoken(char *input) {
+void gettoken(char *input)
+{
 const char delimiter[] = " \t\n";
 char *token = strtok(input, delimiter);
 char *args[MAX_INPUT_SIZE];
