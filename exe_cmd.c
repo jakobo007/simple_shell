@@ -5,20 +5,29 @@
  * @args: Arguments for the command.
  * Return 0
  */
-void execute_command(char *command, char *args[]) {
+void execute_command(char *command, char *args[])
+{
 pid_t pid = fork();
-if (pid == -1) {
+if (pid == -1)
+{
 perror("fork");
 exit(EXIT_FAILURE);
-} else if (pid == 0) {
-if (strchr(command, '/') != NULL) {
+}
+else if (pid == 0)
+{
+if (strchr(command, '/') != NULL)
+{
 execve(command, args, environ);
 perror(args[0]);
 exit(EXIT_FAILURE);
-} else {
+}
+else
+{
 execute_CMD_PATH(command, args);
 }
-} else {
+}
+else
+{
 wait(NULL);
 }
 }
