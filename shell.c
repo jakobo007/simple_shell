@@ -12,14 +12,14 @@ extern char **environ;
 /**
  * new_line - Displays a new line and shell prompt.
  */
-void new_line(void) {
+void new_line() {
 write(STDOUT_FILENO, "\n$ ", 4);
 fflush(stdout);
 }
 /**
  * end_of_file - Displays a message and exits the shell.
  */
-void end_of_file(void) {
+void end_of_file() {
 write(STDOUT_FILENO, "Exiting... \n", strlen("Exiting... \n"));
 exit(EXIT_SUCCESS);
 }
@@ -27,7 +27,7 @@ exit(EXIT_SUCCESS);
 /**
  * environment - Displays the environment variables.
  */
-void environment(void) {
+void environment() {
 char **env = environ;
 while (*env != NULL)
 {
