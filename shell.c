@@ -4,6 +4,9 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+
+extern char **environ;
+
 #define MAX_INPUT_SIZE 1024
 
 void display_prompt() {
