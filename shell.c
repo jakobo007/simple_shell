@@ -10,20 +10,17 @@ extern char **environ;
 
 #define MAX_INPUT_SIZE 1024
 
-
-void display_prompt() {
-    write(STDOUT_FILENO, "$ ", 2);
+void new_line() {
+    write(STDOUT_FILENO, "\n$ ", 3);
     fflush(stdout);
 }
 
-
-void handle_eof() {
+void end_of_file() {
     write(STDOUT_FILENO, "Exiting... \n", strlen("Exiting... \n"));
-    exit(EXIT_SUCCESS);
+    _exit(EXIT_SUCCESS);
 }
 
-
-void print_environment() {
+void environment() {
     char **env = environ;
     while (*env != NULL) {
         size_t len = strlen(*env);
@@ -33,16 +30,15 @@ void print_environment() {
     }
 }
 
-
 void execute_cmd_path(char *cmd, char *args[]) {
     char *path = getenv("PATH");
+    if (path == NULL) {
+        write(STDERR_FILENO, "PATH environment variable not set\n", strlen("PATH environment variable not set\n"));
+        _exit(EXIT_FAILURE);
+    }
+
     char *copy_path = strdup(path);
     char *dir = strtok(copy_path, ":");
-
-    if (path == NULL) {
-        fprintf(stderr, "PATH environment variable not set\n");
-        exit(EXIT_FAILURE);
-    }
 
     while (dir != NULL) {
         char *full_path = malloc(strlen(dir) + strlen(cmd) + 2);
@@ -51,29 +47,30 @@ void execute_cmd_path(char *cmd, char *args[]) {
         if (access(full_path, X_OK) == 0) {
             execve(full_path, args, environ);
             perror("execve");
-            exit(EXIT_FAILURE);
+            _exit(EXIT_FAILURE);
         }
+
         free(full_path);
         dir = strtok(NULL, ":");
     }
 
-    fprintf(stderr, "%s: command not found\n", args[0]);
+    write(STDERR_FILENO, cmd, strlen(cmd));
+    write(STDERR_FILENO, ": command not found\n", strlen(": command not found\n"));
     free(copy_path);
-    exit(EXIT_FAILURE);
+    _exit(EXIT_FAILURE);
 }
-
 
 void execute_command(char *command, char *args[]) {
     pid_t pid = fork();
 
     if (pid == -1) {
         perror("fork");
-        exit(EXIT_FAILURE);
+        _exit(EXIT_FAILURE);
     } else if (pid == 0) {
         if (strchr(command, '/') != NULL) {
             execve(command, args, environ);
             perror(args[0]);
-            exit(EXIT_FAILURE);
+            _exit(EXIT_FAILURE);
         } else {
             execute_cmd_path(command, args);
         }
@@ -82,8 +79,7 @@ void execute_command(char *command, char *args[]) {
     }
 }
 
-
-void tokenize_and_execute(char *input) {
+void gettoken(char *input) {
     const char delimiter[] = " \t\n";
     char *token = strtok(input, delimiter);
     char *args[MAX_INPUT_SIZE];
@@ -91,7 +87,8 @@ void tokenize_and_execute(char *input) {
 
     while (token != NULL) {
         if (i >= MAX_INPUT_SIZE - 1) {
-            fprintf(stderr, "Too many arguments\n");
+            write(STDERR_FILENO, "Too many arguments\n", strlen("Too many arguments\n"));
+            return;
         }
         args[i++] = token;
         token = strtok(NULL, delimiter);
@@ -101,22 +98,18 @@ void tokenize_and_execute(char *input) {
 
     if (i > 0) {
         if (strcmp(args[0], "cd") == 0) {
-
             if (args[1] != NULL) {
                 if (chdir(args[1]) != 0) {
                     perror("cd");
                 }
             } else {
-                fprintf(stderr, "cd: missing argument\n");
+                write(STDERR_FILENO, "cd: missing argument\n", strlen("cd: missing argument\n"));
             }
         } else if (strcmp(args[0], "exit") == 0) {
-
-            exit(EXIT_SUCCESS);
+            _exit(EXIT_SUCCESS);
         } else if (strcmp(args[0], "env") == 0) {
-
-            print_environment();
+            environment();
         } else {
-
             execute_command(args[0], args);
         }
     }
@@ -126,23 +119,21 @@ int main() {
     char *input = NULL;
     size_t size_of_input = 0;
 
-
-    signal(SIGTERM, handle_eof);
-    signal(SIGINT, display_prompt);
+    signal(SIGTERM, end_of_file);
+    signal(SIGINT, new_line);
 
     while (1) {
-        display_prompt();
+        new_line();
 
         if (getline(&input, &size_of_input, stdin) == -1) {
-            perror("getline");
-            exit(EXIT_FAILURE);
+            write(STDERR_FILENO, "getline error\n", strlen("getline error\n"));
+            _exit(EXIT_FAILURE);
         }
 
         input[strcspn(input, "\n")] = '\0';
-        tokenize_and_execute(input);
+        gettoken(input);
     }
 
     free(input);
-
     return 0;
 }
