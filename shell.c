@@ -1,4 +1,13 @@
 #include "main.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <signal.h>
+#define MAX_INPUT_SIZE 1024
+extern char **environ;
 
 /**
  * new_line - Displays a new line and shell prompt.
