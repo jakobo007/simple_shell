@@ -24,8 +24,8 @@ exit(EXIT_FAILURE);
 else
 {
 execute_CMD_PATH(command, args);
-}
 } */
+} 
 else
 {
 wait(NULL);
