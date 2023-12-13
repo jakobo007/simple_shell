@@ -1,4 +1,10 @@
 #include "main.h"
+/**
+ * execute_CMD_PATH - Execute a command by searching in the PATH.
+ * @cmd: The command to execute.
+ * @args: Arguments for the command.
+ * Return: 0
+ */
 void execute_CMD_PATH(char *cmd, char *args[]) {
         char *path = getenv("PATH");
         char *copy_path = strdup(path);

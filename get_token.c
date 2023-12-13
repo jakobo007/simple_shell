@@ -1,4 +1,9 @@
 #include "main.h"
+/**
+ * gettoken - Tokenize input and execute the appropriate action.
+ * @input: The input string to tokenize.
+ * Return 0
+ */
 void gettoken(char *input) {
     const char delimiter[] = " \t\n";
     char *token = strtok(input, delimiter);

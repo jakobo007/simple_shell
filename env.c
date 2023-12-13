@@ -1,4 +1,8 @@
 #include "main.h"
+/**
+ * environment - Print the environment variables.
+ * Return 0
+ */
 void environment() {
         char **env = environ;
     while (*env != NULL) {

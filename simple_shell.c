@@ -1,6 +1,8 @@
 #include "main.h"
-extern char **environ;
-
+/**
+ * main - Main function for the shell program.
+ * Return: Always 0.
+ */
 int main() {
         char *input = NULL;
         size_t size_of_input = 0;

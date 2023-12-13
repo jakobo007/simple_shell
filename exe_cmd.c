@@ -1,4 +1,10 @@
 #include "main.h"
+/**
+ * execute_command - Execute a command using fork and execve.
+ * @command: The command to execute.
+ * @args: Arguments for the command.
+ * Return 0
+ */
 void execute_command(char *command, char *args[]) {
     pid_t pid = fork();
 
@@ -18,4 +24,3 @@ void execute_command(char *command, char *args[]) {
     }
 
 }
-
