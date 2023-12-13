@@ -13,5 +13,10 @@
 extern char **environ;
 
 void new_line();
+void gettoken(char *input);
+void execute_command(char *command, char *args[]);
+void execute_CMD_PATH(char *cmd, char *args[]);
+void environment();
+void end_of_file();
 
 #endif
