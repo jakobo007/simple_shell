@@ -5,7 +5,6 @@
 #include <sys/wait.h>
 
 #define MAX_INPUT_SIZE 1024
-#define MAX_PATH_SIZE 1024
 
 void display_prompt() {
     write(STDOUT_FILENO, "#cisfun$ ", 9);
@@ -13,9 +12,10 @@ void display_prompt() {
 
 int main(void) {
     char input[MAX_INPUT_SIZE];
-    char path[MAX_PATH_SIZE];
 
     while (1) {
+        pid_t pid;
+
         display_prompt();
 
         if (read(STDIN_FILENO, input, MAX_INPUT_SIZE) == 0) {
@@ -27,7 +27,7 @@ int main(void) {
 
         input[strcspn(input, "\n")] = '\0';
 
-        pid_t pid = fork();
+        pid = fork();
 
         if (pid == -1) {
             char *error_msg = "./shell: fork: error\n";
@@ -36,15 +36,13 @@ int main(void) {
         }
 
         if (pid == 0) {
-
             if (execve(input, NULL, environ) == -1) {
                 char *error_msg = "./shell: No such file or directory\n";
                 write(STDERR_FILENO, error_msg, strlen(error_msg));
                 exit(EXIT_FAILURE);
             }
         } else {
-
-            int status;
+          int status;
             waitpid(pid, &status, 0);
 
             if (WIFEXITED(status) && WEXITSTATUS(status) == 127) {
