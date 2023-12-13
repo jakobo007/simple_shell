@@ -18,6 +18,6 @@ void execute_command(char *command, char *args[]);
 void execute_CMD_PATH(char *cmd, char *args[]);
 void environment(void);
 void end_of_file(void);
-void new_line(void)
+void new_line(void);
 
 #endif
