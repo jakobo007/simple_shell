@@ -39,12 +39,14 @@ int main(void) {
         }
 
         if (pid == 0) {
-
-if (execve(input, (char *[]) {input, NULL}, environ) == -1) {
+            
+if (execve(input, (char *const*) (char *[]) {input, NULL}, environ) == -1) {
     char *error_msg = "./shell: No such file or directory\n";
     write(STDERR_FILENO, error_msg, strlen(error_msg));
     exit(EXIT_FAILURE);
 }
+
+        }
 
         } else {
           int status;
