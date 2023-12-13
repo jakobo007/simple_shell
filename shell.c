@@ -32,13 +32,12 @@ void environment() {
 
 void execute_cmd_path(char *cmd, char *args[]) {
     char *path = getenv("PATH");
+    char *copy_path = strdup(path);
+    char *dir = strtok(copy_path, ":");
     if (path == NULL) {
         write(STDERR_FILENO, "PATH environment variable not set\n", strlen("PATH environment variable not set\n"));
         _exit(EXIT_FAILURE);
     }
-
-    char *copy_path = strdup(path);
-    char *dir = strtok(copy_path, ":");
 
     while (dir != NULL) {
         char *full_path = malloc(strlen(dir) + strlen(cmd) + 2);
