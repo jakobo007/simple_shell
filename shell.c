@@ -4,6 +4,7 @@
 #include <string.h>
 #include <signal.h>
 #include <sys/wait.h>
+#include <unistd.h>
 #define MAX_INPUT_SIZE 1024
 
 
