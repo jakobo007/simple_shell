@@ -19,7 +19,7 @@ signal(SIGINT, new_line);
 while(1)
 {
 write(STDOUT_FILENO, "$ ", 2);
-fflush(stdout);
+/**fflush(stdout); **/
 if (getline(&input, &size_of_input, stdin) == -1)
 {
 perror("getline");
