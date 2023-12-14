@@ -6,7 +6,7 @@
 #include <signal.h>
 
 
-void handlle_signal(int signol)
+void handle_signal(int signol)
 {
     if (signol == SIGINT || signol == SIGQUIT)
     {
@@ -20,8 +20,8 @@ char *input = NULL;
 size_t size_of_input = 0;
 size_t length;
 
-signal(SIGINT, handle_signal):
-signal(SIGQUIT, handle_signal):
+signal(SIGINT, handle_signal);
+signal(SIGQUIT, handle_signal);
 
 while (1) {
 
