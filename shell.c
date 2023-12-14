@@ -1,10 +1,16 @@
-#include <unistd.h>
 #include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#include <sys/wait.h>
+#define MAX_INPUT_SIZE 1024
 
+
+
+
+
+extern char **environ;
 
 void handle_signal(int signol)
 {
@@ -12,6 +18,50 @@ void handle_signal(int signol)
     {
         fprintf(stderr, "\n");
         exit(EXIT_SUCCESS);
+    }
+}
+
+void execute_command(char *command, char *args[]) {
+    pid_t pid = fork();
+
+    if (pid == -1) {
+        perror("fork");
+        exit(EXIT_FAILURE);
+    } else if (pid == 0) {
+        if (strchr(command, '/') != NULL) {
+            execve(command, args, environ);
+            perror(args[0]);
+            exit(EXIT_FAILURE);
+        } else {
+        wait(NULL);
+    }
+    }
+
+}
+
+
+void get_token(char *input){
+        const char delimiter[] = " \t\n";
+    char *token = strtok(input, delimiter);
+    char *args[MAX_INPUT_SIZE];
+    int i = 0;
+    while (token != NULL) {
+        if (i >= MAX_INPUT_SIZE - 1) {
+                fprintf(stderr, "Too many arguments\n");
+        }
+        args[i++] = token;
+        token = strtok(NULL, delimiter);
+    }
+
+    args[i] = NULL;
+
+    if (i > 0) {
+        if (access(args[0], X_OK) == -1) {
+            fprintf(stderr, "%s: No such file or directory\n", args[0]);
+
+        } else {
+               execute_command(args[0], args);
+        }
     }
 }
 
@@ -41,15 +91,23 @@ while (1) {
         }
 
 
-        /** CHECK IF CMD EXIST **/
-        if (access(input, X_OK) == -1) {
-            fprintf(stderr, "%s: No such file or directory\n", "./shell");
-            continue; 
-        }
 
+        get_token(input);
 
+/**
+        pid_t pid = fork();
 
-
+        if (pid == -1) {
+            perror("fork");
+            return EXIT_FAILURE;
+        } else if (pid == 0) {
+            char *args[] = {input, NULL};
+            execve(input, args, environ);
+            perror("execve");
+            _exit(EXIT_FAILURE);
+        } else {
+                wait(NULL);
+        } **/
 }
 free(input);
 return (0);
