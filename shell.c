@@ -70,10 +70,12 @@ while (1) {
 
  write(STDOUT_FILENO, "$ ", 2);
         if (getline(&input, &size_of_input, stdin) == -1) {
-                if (feof(stdin)) {
+                if (input == NULL) {
+                    write(STDOUT_FILENO, "End of file\n", 12)
                         break;
                 } else {
                         perror("getline");
+                        free(input);
                         return (EXIT_FAILURE);
                 }
         }
