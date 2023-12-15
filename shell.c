@@ -29,7 +29,6 @@ void execute_command(char *command, char *args[]) {
         perror("fork");
         exit(EXIT_FAILURE);
     } else if (pid == 0) {
-        if (strchr(command, '/') != NULL) {
             execve(command, args, environ);
             perror(args[0]);
             exit(EXIT_FAILURE);
@@ -37,9 +36,6 @@ void execute_command(char *command, char *args[]) {
         wait(NULL);
     }
     }
-
-}
-
 
 void get_token(char *input){
         const char delimiter[] = " \t\n";
@@ -90,25 +86,7 @@ while (1) {
         if (length > 0 && input[length - 1] == '\n') {
         input[length] = '\0';
         }
-
-
-
         get_token(input);
-
-/**
-        pid_t pid = fork();
-
-        if (pid == -1) {
-            perror("fork");
-            return EXIT_FAILURE;
-        } else if (pid == 0) {
-            char *args[] = {input, NULL};
-            execve(input, args, environ);
-            perror("execve");
-            _exit(EXIT_FAILURE);
-        } else {
-                wait(NULL);
-        } **/
 }
 free(input);
 return (0);
