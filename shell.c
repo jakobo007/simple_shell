@@ -7,10 +7,6 @@
 #include <unistd.h>
 #define MAX_INPUT_SIZE 1024
 
-
-
-
-
 extern char **environ;
 
 void handle_signal(int signol)
@@ -85,8 +81,8 @@ while (1) {
         length = strcspn(input, "\n");
         if (length > 0 && input[length - 1] == '\n') {
         input[length] = '\0';
-        }
         get_token(input);
+        }
 }
 free(input);
 return (0);
