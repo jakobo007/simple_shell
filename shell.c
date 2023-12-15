@@ -69,7 +69,7 @@ signal(SIGQUIT, handle_signal);
 while (1) {
 
  write(STDOUT_FILENO, "$ ", 2);
-        if (getline(&input, &size_of_input, stdin) == -1) {
+        if (getline(&input, &size_of_input, stdin) != -1) {
                 if (input == NULL) {
                     write(STDOUT_FILENO, "End of file\n", 12);
                         break;
@@ -78,6 +78,8 @@ while (1) {
                         free(input);
                         return (EXIT_FAILURE);
                 }
+
+                
         }
 
         length = strcspn(input, "\n");
