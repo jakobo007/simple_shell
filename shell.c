@@ -68,13 +68,13 @@ void execute_builtin_command(char **tokens) {
 void execute_path_command(char **tokens) {
     char *path = getenv("PATH");
     char *path_copy = strdup(path);
-
+    char *path_token = strtok(path_copy, ":");
     if (path_copy == NULL) {
         perror("strdup");
         exit(EXIT_FAILURE);
     }
 
-    char *path_token = strtok(path_copy, ":");
+    
     while (path_token != NULL) {
         char *full_path = malloc(strlen(path_token) + strlen(tokens[0]) + 2);
         if (full_path == NULL) {
@@ -97,11 +97,12 @@ int main() {
     char *input = NULL;
     size_t size_of_input = 0;
     char *tokens[MAX_TOKENS];
-
+    ssize_t read_result = getline(&input, &size_of_input, stdin);
+            size_t length = strcspn(input, "\n");
     while (1) {
         display_prompt();
 
-        ssize_t read_result = getline(&input, &size_of_input, stdin);
+        
 
         if (read_result == -1) {
             if (input == NULL) {
@@ -114,7 +115,7 @@ int main() {
             }
         }
 
-        size_t length = strcspn(input, "\n");
+
         if (length > 0 && input[length - 1] == '\n') {
             input[length - 1] = '\0';
         }
