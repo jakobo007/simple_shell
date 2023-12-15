@@ -73,20 +73,20 @@ while (1) {
                 if (input == NULL) {
                     write(STDOUT_FILENO, "End of file\n", 12);
                         break;
-                } else {
+                } else if (input != NULL) {
+                    length = strcspn(input, "\n");
+                    if (length > 0 && input[length - 1] == '\n') {
+                    input[length] = '\0';
+                get_token(input);
+                            }
+                }
+                else {
                         perror("getline");
                         free(input);
                         return (EXIT_FAILURE);
-                }
-
-                
+                }                
         }
 
-        length = strcspn(input, "\n");
-        if (length > 0 && input[length - 1] == '\n') {
-        input[length] = '\0';
-        get_token(input);
-        }
 }
 free(input);
 return (0);
