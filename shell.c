@@ -1,136 +1,147 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
 #include <sys/wait.h>
+#include <signal.h>
+
+extern char **environ;
 
 #define MAX_INPUT_SIZE 1024
-#define MAX_TOKENS 64
-extern char **environ;
-void display_prompt() {
-    write(STDOUT_FILENO, "#cisfun$ ", 9);
+
+void new_line() {
+        write(STDOUT_FILENO, "\n$ ", 4);
+        fflush(stdout);
 }
 
-void execute_command(char **tokens) {
+void end_of_file() {
+        write(STDOUT_FILENO, "Exiting... \n", strlen("Exiting... \n"));
+        exit(EXIT_SUCCESS);
+}
+
+void environment() {
+        char **env = environ;
+    while (*env != NULL) {
+        size_t len = strlen(*env);
+        write(STDOUT_FILENO, *env, len);
+        write(STDOUT_FILENO, "\n", 1);
+        env++;
+    }
+}
+
+
+void execute_CMD_PATH(char *cmd, char *args[]) {
+        char *path = getenv("PATH");
+        char *copy_path = strdup(path);
+        char *dir = strtok(copy_path, ":");
+
+        if (path == NULL) {
+                fprintf(stderr, "PATH environment variable not set\n");
+                exit(EXIT_FAILURE);
+        }
+
+        while(dir != NULL) {
+                char *full_path = malloc(strlen(dir) + strlen(cmd) + 2);
+                sprintf(full_path, "%s/%s", dir, cmd);
+
+                if (access(full_path, X_OK) == 0) {
+                execve(full_path, args, environ);
+                perror("execve");
+                exit(EXIT_FAILURE);
+                }
+                free(full_path);
+                dir = strtok(NULL, ":");
+        }
+
+        fprintf(stderr, "%s: command not found\n", args[0]);
+        free(copy_path);
+        exit(EXIT_FAILURE);
+}
+
+void execute_command(char *command, char *args[]) {
     pid_t pid = fork();
 
     if (pid == -1) {
         perror("fork");
         exit(EXIT_FAILURE);
     } else if (pid == 0) {
-        
-        execve(tokens[0], tokens, NULL);
-
-        
-        perror("execve");
-        _exit(EXIT_FAILURE);
-    } else {
-    
-        int status;
-        waitpid(pid, &status, 0);
-
-        if (WIFEXITED(status) && WEXITSTATUS(status) != 0) {
-            write(STDOUT_FILENO, "./shell: No such file or directory\n", 36);
-        }
-    }
-}
-
-void get_tokens(char *input, char **tokens) {
-    const char delimiter[] = " \t\n"; 
-    size_t index = 0;
-
-    tokens[index] = strtok(input, delimiter);
-    while (tokens[index] != NULL && index < MAX_TOKENS - 1) {
-        index++;
-        tokens[index] = strtok(NULL, delimiter);
-    }
-    tokens[index] = NULL; 
-}
-
-int is_builtin_command(char *command) {
-    return strcmp(command, "exit") == 0 || strcmp(command, "env") == 0;
-}
-
-void execute_builtin_command(char **tokens) {
-    if (strcmp(tokens[0], "exit") == 0) {
-        write(STDOUT_FILENO, "exit\n", 5);
-        exit(EXIT_SUCCESS);
-    } else if (strcmp(tokens[0], "env") == 0) {
-        char **env = environ;
-        while (*env != NULL) {
-            write(STDOUT_FILENO, *env, strlen(*env));
-            write(STDOUT_FILENO, "\n", 1);
-            env++;
-        }
-    }
-}
-
-void execute_path_command(char **tokens) {
-    char *path = getenv("PATH");
-    char *path_copy = strdup(path);
-    char *path_token = strtok(path_copy, ":");
-    if (path_copy == NULL) {
-        perror("strdup");
-        exit(EXIT_FAILURE);
-    }
-
-    
-    while (path_token != NULL) {
-        char *full_path = malloc(strlen(path_token) + strlen(tokens[0]) + 2);
-        if (full_path == NULL) {
-            perror("malloc");
+        if (strchr(command, '/') != NULL) {
+            execve(command, args, environ);
+            perror(args[0]);
             exit(EXIT_FAILURE);
-        }
-
-        sprintf(full_path, "%s/%s", path_token, tokens[0]);
-
-        execve(full_path, tokens, NULL);
-        free(full_path);
-        path_token = strtok(NULL, ":");
+        } else {
+                execute_CMD_PATH(command, args);
+         }
+    } else {
+        wait(NULL);
     }
-    write(STDOUT_FILENO, "./shell: No such file or directory\n", 36);
 
-    free(path_copy);
 }
+
+
+
+
+void gettoken(char *input) {
+    const char delimiter[] = " \t\n";
+    char *token = strtok(input, delimiter);
+    char *args[MAX_INPUT_SIZE];
+    int i = 0;
+    while (token != NULL) {
+        if (i >= MAX_INPUT_SIZE - 1) {
+                fprintf(stderr, "Too many arguments\n");
+        }
+        args[i++] = token;
+        token = strtok(NULL, delimiter);
+    }
+
+    args[i] = NULL;
+
+    if (i > 0) {
+        if (strcmp(args[0], "cd") == 0) {
+            if (args[1] != NULL) {
+                if (chdir(args[1]) != 0) {
+                    perror("cd");
+                }
+            } else {
+                fprintf(stderr, "cd: missing argument\n");
+            }
+
+        } else if (strcmp(args[0], "exit") == 0) {
+            exit(EXIT_SUCCESS);
+        } else if (strcmp(args[0], "env") == 0) {
+                environment();
+        } else {
+            execute_command(args[0], args);
+        }
+    }
+}
+
+
 
 int main() {
-    char *input = NULL;
-    size_t size_of_input = 0;
-    char *tokens[MAX_TOKENS];
-    ssize_t read_result = getline(&input, &size_of_input, stdin);
-            size_t length = strcspn(input, "\n");
-    while (1) {
-        display_prompt();
+        char *input = NULL;
+        size_t size_of_input = 0;
 
-        
+        signal(SIGTERM, end_of_file);
+        signal(SIGINT, new_line);
 
-        if (read_result == -1) {
-            if (input == NULL) {
-                write(STDOUT_FILENO, "exit\n", 5);
-                break;
-            } else {
+        while(1) {
+                write(STDOUT_FILENO, "$ ", 2);
+                fflush(stdout);
+
+
+                if (getline(&input, &size_of_input, stdin) == -1) {
                 perror("getline");
-                free(input);
                 exit(EXIT_FAILURE);
-            }
+                }
+
+                input[strcspn(input, "\n")] = '\0';
+                gettoken(input);
+
         }
 
+        free(input);
 
-        if (length > 0 && input[length - 1] == '\n') {
-            input[length - 1] = '\0';
-        }
-
-        get_tokens(input, tokens);
-
-        if (tokens[0] != NULL) {
-            if (is_builtin_command(tokens[0])) {
-                execute_builtin_command(tokens);
-            } else {
-                execute_path_command(tokens);
-            }
-        }
-    }
-
-    free(input);
-    return EXIT_SUCCESS;
-}
+        return 0;
+}                    
