@@ -58,15 +58,59 @@ void get_token(char *input){
     }
 }
 
+
+
+int main() {
+    char *input = NULL;
+    size_t size_of_input = 0;
+    ssize_t read_result;
+    size_t length;
+
+    while (1) {
+        signal(SIGINT, handle_signal);
+        signal(SIGQUIT, handle_signal);
+
+        write(STDOUT_FILENO, "$ ", 2);
+
+        read_result = getline(&input, &size_of_input, stdin);
+
+        if (read_result == -1) {
+            if (input == NULL) {
+                write(STDOUT_FILENO, "End of file\n", 12);
+                break;
+            } else {
+                perror("getline");
+                free(input);
+                return EXIT_FAILURE;
+            }
+        }
+
+        if (input != NULL) {
+            length = strcspn(input, "\n");
+            if (length > 0 && input[length - 1] == '\n') {
+                input[length] = '\0';
+                get_token(input);
+            }
+        }
+    }
+
+    free(input);
+    return 0;
+}
+
+
+/***
 int main() {
 char *input = NULL;
 size_t size_of_input = 0;
 size_t length;
 
-signal(SIGINT, handle_signal);
-signal(SIGQUIT, handle_signal);
+
 
 while (1) {
+
+    signal(SIGINT, handle_signal);
+signal(SIGQUIT, handle_signal);
 
  write(STDOUT_FILENO, "$ ", 2);
         if (getline(&input, &size_of_input, stdin) != -1) {
@@ -91,3 +135,5 @@ while (1) {
 free(input);
 return (0);
 }
+
+**/
